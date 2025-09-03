@@ -11,7 +11,6 @@ public class Receipt {
         this.totalPrice = totalPrice;
     }
 
-    // Getters
     public List<ReceiptItem> getReceiptItems() { return receiptItems; }
     public int getTotalPrice() { return totalPrice; }
 }

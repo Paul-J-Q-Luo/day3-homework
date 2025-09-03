@@ -58,4 +58,9 @@ public class ReceiptGenerator {
                 .mapToInt(ReceiptItem::getSubTotal)
                 .sum();
     }
+
+    private String renderReceipt(Receipt receipt) {
+        String itemsReceipt = generateItemsReceipt(receipt.getReceiptItems());
+        return generateReceipt(itemsReceipt, receipt.getTotalPrice());
+    }
 }
