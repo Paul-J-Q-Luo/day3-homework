@@ -9,9 +9,9 @@ public class ReceiptGenerator {
     private final Map<String, Item> inventory = new HashMap<>();
 
     public ReceiptGenerator() {
-        inventory.put("12345", new Item("Milk", "12345", 250)); // Price in cents
-        inventory.put("67890", new Item("Bread", "67890", 180));
-        inventory.put("11223", new Item("Eggs", "11223", 300));
+        inventory.put("12345", new Item("12345", "Milk", 3));
+        inventory.put("67890", new Item("67890", "Bread", 3));
+        inventory.put("11223", new Item("11223", "Eggs", 2));
     }
 
     public String printReceipt(List<String> barcodes) {
@@ -65,22 +65,22 @@ public class ReceiptGenerator {
     }
 
     private String generateItemsReceipt(List<ReceiptItem> receiptItems) {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder itemsReceipt = new StringBuilder();
         for (ReceiptItem item : receiptItems) {
-            double unitPrice = item.getUnitPrice() / 100.0;
-            double subTotal = item.getSubTotal() / 100.0;
-            sb.append(String.format("%s (x%d) @ $%.2f = $%.2f\n",
-                    item.getName(), item.getQuantity(), unitPrice, subTotal));
+            itemsReceipt.append(String.format("Name: %s, Quantity: %d, Unit price: %d (yuan), Subtotal: %d (yuan)\n",
+                    item.getName(),
+                    item.getQuantity(),
+                    item.getUnitPrice(),
+                    item.getSubTotal()));
         }
-        return sb.toString();
+        return itemsReceipt.toString();
     }
 
     private String generateReceipt(String itemsReceipt, int totalPrice) {
-        double total = totalPrice / 100.0;
-        return "--- Your Receipt ---\n" +
+        return "***<store earning no money>Receipt***\n" +
                 itemsReceipt +
-                "--------------------\n" +
-                String.format("Total: $%.2f\n", total) +
-                "--------------------";
+                "----------------------\n" +
+                String.format("Total: %d (yuan)\n", totalPrice) +
+                "**********************";
     }
 }
