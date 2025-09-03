@@ -1,5 +1,6 @@
 package org.example;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,5 +18,22 @@ public class ReceiptGenerator {
         List<ReceiptItem> receiptItems = decodeToItems(barcodes);
         Receipt receipt = calculateCost(receiptItems);
         return renderReceipt(receipt);
+    }
+
+    private List<ReceiptItem> decodeToItems(List<String> barcodes) {
+        Map<String, Integer> barcodeCounts = new HashMap<>();
+        for (String barcode : barcodes) {
+            barcodeCounts.put(barcode, barcodeCounts.getOrDefault(barcode, 0) + 1);
+        }
+
+        List<ReceiptItem> receiptItems = new ArrayList<>();
+        barcodeCounts.forEach((barcode, count) -> {
+            Item item = loadItem(barcode);
+            if (item != null) {
+                receiptItems.add(new ReceiptItem(item.getName(), item.getBarcode(), count, item.getPrice()));
+            }
+        });
+
+        return receiptItems;
     }
 }
