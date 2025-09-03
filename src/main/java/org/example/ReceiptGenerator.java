@@ -40,4 +40,22 @@ public class ReceiptGenerator {
     private Item loadItem(String barcode) {
         return inventory.get(barcode);
     }
+
+    private Receipt calculateCost(List<ReceiptItem> receiptItems) {
+        calculateItemsCost(receiptItems);
+        int totalPrice = calculateTotalPrice(receiptItems);
+        return new Receipt(receiptItems, totalPrice);
+    }
+
+    private void calculateItemsCost(List<ReceiptItem> receiptItems) {
+        for (ReceiptItem item : receiptItems) {
+            item.setSubTotal(item.getQuantity() * item.getUnitPrice());
+        }
+    }
+
+    private int calculateTotalPrice(List<ReceiptItem> receiptItems) {
+        return receiptItems.stream()
+                .mapToInt(ReceiptItem::getSubTotal)
+                .sum();
+    }
 }
