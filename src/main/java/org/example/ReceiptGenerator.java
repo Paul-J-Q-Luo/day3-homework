@@ -63,4 +63,24 @@ public class ReceiptGenerator {
         String itemsReceipt = generateItemsReceipt(receipt.getReceiptItems());
         return generateReceipt(itemsReceipt, receipt.getTotalPrice());
     }
+
+    private String generateItemsReceipt(List<ReceiptItem> receiptItems) {
+        StringBuilder sb = new StringBuilder();
+        for (ReceiptItem item : receiptItems) {
+            double unitPrice = item.getUnitPrice() / 100.0;
+            double subTotal = item.getSubTotal() / 100.0;
+            sb.append(String.format("%s (x%d) @ $%.2f = $%.2f\n",
+                    item.getName(), item.getQuantity(), unitPrice, subTotal));
+        }
+        return sb.toString();
+    }
+
+    private String generateReceipt(String itemsReceipt, int totalPrice) {
+        double total = totalPrice / 100.0;
+        return "--- Your Receipt ---\n" +
+                itemsReceipt +
+                "--------------------\n" +
+                String.format("Total: $%.2f\n", total) +
+                "--------------------";
+    }
 }
