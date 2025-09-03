@@ -29,9 +29,10 @@ public class ReceiptGenerator {
         List<ReceiptItem> receiptItems = new ArrayList<>();
         barcodeCounts.forEach((barcode, count) -> {
             Item item = loadItem(barcode);
-            if (item != null) {
-                receiptItems.add(new ReceiptItem(item.getName(), item.getBarcode(), count, item.getPrice()));
+            if (item == null) {
+                throw new IllegalArgumentException("Unknown barcode detected: " + barcode);
             }
+            receiptItems.add(new ReceiptItem(item.getName(), item.getBarcode(), count, item.getPrice()));
         });
 
         return receiptItems;
