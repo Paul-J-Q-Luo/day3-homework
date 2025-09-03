@@ -36,4 +36,8 @@ public class ReceiptGenerator {
 
         return receiptItems;
     }
+
+    private Item loadItem(String barcode) {
+        return inventory.get(barcode);
+    }
 }
