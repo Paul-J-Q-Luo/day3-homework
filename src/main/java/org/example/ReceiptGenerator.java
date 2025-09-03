@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class ReceiptGenerator {
     private final Map<String, Item> inventory = new HashMap<>();
@@ -21,21 +23,23 @@ public class ReceiptGenerator {
     }
 
     private List<ReceiptItem> decodeToItems(List<String> barcodes) {
-        Map<String, Integer> barcodeCounts = new HashMap<>();
-        for (String barcode : barcodes) {
-            barcodeCounts.put(barcode, barcodeCounts.getOrDefault(barcode, 0) + 1);
-        }
+        Map<String, Long> barcodeCounts = barcodes.stream()
+                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
 
-        List<ReceiptItem> receiptItems = new ArrayList<>();
-        barcodeCounts.forEach((barcode, count) -> {
-            Item item = loadItem(barcode);
-            if (item == null) {
+        barcodeCounts.keySet().forEach(barcode -> {
+            if (loadItem(barcode) == null) {
                 throw new IllegalArgumentException("Unknown barcode detected: " + barcode);
             }
-            receiptItems.add(new ReceiptItem(item.getName(), item.getBarcode(), count, item.getPrice()));
         });
 
-        return receiptItems;
+        return barcodeCounts.entrySet().stream()
+                .map(entry -> {
+                    String barcode = entry.getKey();
+                    int count = entry.getValue().intValue();
+                    Item item = loadItem(barcode);
+                    return new ReceiptItem(item.getName(), item.getBarcode(), count, item.getPrice());
+                })
+                .collect(Collectors.toList());
     }
 
     private Item loadItem(String barcode) {
@@ -66,15 +70,13 @@ public class ReceiptGenerator {
     }
 
     private String generateItemsReceipt(List<ReceiptItem> receiptItems) {
-        StringBuilder itemsReceipt = new StringBuilder();
-        for (ReceiptItem item : receiptItems) {
-            itemsReceipt.append(String.format("Name: %s, Quantity: %d, Unit price: %d (yuan), Subtotal: %d (yuan)\n",
-                    item.getName(),
-                    item.getQuantity(),
-                    item.getUnitPrice(),
-                    item.getSubTotal()));
-        }
-        return itemsReceipt.toString();
+        return receiptItems.stream()
+                .map(item -> String.format("Name: %s, Quantity: %d, Unit price: %d (yuan), Subtotal: %d (yuan)",
+                        item.getName(),
+                        item.getQuantity(),
+                        item.getUnitPrice(),
+                        item.getSubTotal()))
+                .collect(Collectors.joining("\n"));
     }
 
     private String generateReceipt(String itemsReceipt, int totalPrice) {
