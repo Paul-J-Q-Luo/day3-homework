@@ -1,9 +1,6 @@
 package org.example;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -11,9 +8,9 @@ public class ReceiptGenerator {
     private final Map<String, Item> inventory = new HashMap<>();
 
     public ReceiptGenerator() {
-        inventory.put("12345", new Item("12345", "Milk", 3));
-        inventory.put("67890", new Item("67890", "Bread", 3));
-        inventory.put("11223", new Item("11223", "Eggs", 2));
+        inventory.put("ITEM000000", new Item("ITEM000000", "Coca-Cola", 3));
+        inventory.put("ITEM000001", new Item("ITEM000001", "Sprite", 3));
+        inventory.put("ITEM000004", new Item("ITEM000004", "Battery", 2));
     }
 
     public String printReceipt(List<String> barcodes) {
@@ -24,7 +21,9 @@ public class ReceiptGenerator {
 
     private List<ReceiptItem> decodeToItems(List<String> barcodes) {
         Map<String, Long> barcodeCounts = barcodes.stream()
-                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+                .collect(Collectors.groupingBy(Function.identity(),
+                        LinkedHashMap::new,
+                        Collectors.counting()));
 
         barcodeCounts.keySet().forEach(barcode -> {
             if (loadItem(barcode) == null) {
@@ -82,7 +81,7 @@ public class ReceiptGenerator {
     private String generateReceipt(String itemsReceipt, int totalPrice) {
         return "***<store earning no money>Receipt***\n" +
                 itemsReceipt +
-                "----------------------\n" +
+                "\n----------------------\n" +
                 String.format("Total: %d (yuan)\n", totalPrice) +
                 "**********************";
     }
