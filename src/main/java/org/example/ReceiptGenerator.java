@@ -25,17 +25,14 @@ public class ReceiptGenerator {
                         LinkedHashMap::new,
                         Collectors.counting()));
 
-        barcodeCounts.keySet().forEach(barcode -> {
-            if (loadItem(barcode) == null) {
-                throw new IllegalArgumentException("Unknown barcode detected: " + barcode);
-            }
-        });
-
         return barcodeCounts.entrySet().stream()
                 .map(entry -> {
                     String barcode = entry.getKey();
                     int count = entry.getValue().intValue();
                     Item item = loadItem(barcode);
+                    if (loadItem(barcode) == null) {
+                        throw new IllegalArgumentException("Unknown barcode detected: " + barcode);
+                    }
                     return new ReceiptItem(item.getName(), item.getBarcode(), count, item.getPrice());
                 })
                 .collect(Collectors.toList());
